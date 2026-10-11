@@ -8,34 +8,58 @@
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 [![Tests](https://img.shields.io/badge/Pytest-19%20Passed-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](apps/api/tests)
 
+[![SDG 9](https://img.shields.io/badge/UN%20SDG%209-Industry%2C%20Innovation%20%26%20Infrastructure-FD6925?style=flat-square)](https://sdgs.un.org/goals/goal9)
+[![SDG 12](https://img.shields.io/badge/UN%20SDG%2012-Responsible%20Consumption%20%26%20Production-BF8B2E?style=flat-square)](https://sdgs.un.org/goals/goal12)
+[![SDG 13](https://img.shields.io/badge/UN%20SDG%2013-Climate%20Action-3F7E44?style=flat-square)](https://sdgs.un.org/goals/goal13)
+[![SDG 17](https://img.shields.io/badge/UN%20SDG%2017-Partnerships%20for%20the%20Goals-19486A?style=flat-square)](https://sdgs.un.org/goals/goal17)
+
 > **A secure B2B Industrial Symbiosis & Circular Economy marketplace where manufacturing plants trade byproduct waste directly as secondary raw materials — eliminating middlemen, slashing landfill dumping, and cutting industrial carbon footprints.**
 
 ---
 
 ## 📌 Table of Contents
 1. [Executive Summary & Problem Statement](#-executive-summary--problem-statement)
-2. [Our Solution: Industrial Symbiosis](#-our-solution-industrial-symbiosis)
-3. [Real-World Case Studies & User Personas](#-real-world-case-studies--user-personas)
+2. [Market Comparison: Traditional Brokers vs. Waste Exchange](#-market-comparison-traditional-middlemen-vs-waste-exchange)
+3. [Our Solution: Industrial Symbiosis](#-our-solution-industrial-symbiosis)
+4. [Real-World Case Studies & User Personas](#-real-world-case-studies--user-personas)
    - [Case Study 1: Biomass Byproduct Exchange (Tharsan ➔ Surendar)](#case-study-1-biomass-byproduct-symbiosis-tharsan--surendar)
    - [Case Study 2: Industrial Mineral & Ash Exchange (Shaurgesh ➔ Ananthi)](#case-study-2-mineral--fly-ash-symbiosis-shaurgesh--ananthi)
-4. [Platform Core Features](#-platform-core-features)
-5. [System Architecture](#-system-architecture)
-6. [Technology Stack](#-technology-stack)
-7. [Database Schema & Security Policies](#-database-schema--security-policies)
-8. [Project Structure](#-project-structure)
-9. [Getting Started (Local Development)](#-getting-started-local-development)
-10. [Test Suite & Verification](#-test-suite--verification)
-11. [Project Team & Contributors](#-project-team--contributors)
+5. [End-to-End Workflow & Lifecycle (Mermaid Diagram)](#-end-to-end-workflow--lifecycle)
+6. [Platform Core Features & Innovations](#-platform-core-features--innovations)
+7. [System Architecture & AWS S3 Vault](#-system-architecture--aws-s3-vault)
+8. [Carbon Accounting & ESG Mathematical Model](#-carbon-accounting--esg-mathematical-model)
+9. [Technology Stack](#-technology-stack)
+10. [REST API Quick Reference](#-rest-api-quick-reference)
+11. [Database Schema & Security Policies](#-database-schema--security-policies)
+12. [Project Structure](#-project-structure)
+13. [Getting Started (Local Development)](#-getting-started-local-development)
+14. [Test Suite & Verification (19 Passing Tests)](#-test-suite--verification)
+15. [Future Roadmap & Horizons](#-future-roadmap--horizons)
+16. [Project Team & Contributors](#-project-team--contributors)
 
 ---
 
 ## 🏭 Executive Summary & Problem Statement
 
 In conventional linear manufacturing (**Take ➔ Make ➔ Waste**):
-- **Invisible Raw Materials:** One industry's discarded byproduct is another industry's valuable raw material (e.g., sugar mill bagasse for bio-pellets, power plant fly ash for cement). However, industries lack visibility into cross-sector supply chains.
-- **Predatory Middlemen:** Unorganized brokers control byproduct logistics, taking **40%–60% margins** while providing zero chemical transparency or regulatory compliance.
+- **Invisible Raw Materials:** One industry's discarded byproduct is another industry's valuable raw material (e.g., sugar mill bagasse for bio-pellets, power plant fly ash for cement). However, industries operate in silos with zero visibility into cross-sector supply chains.
+- **Predatory Middlemen:** Unorganized scrap dealers and brokers control byproduct logistics, taking **40%–60% margins** while providing zero chemical transparency or regulatory compliance.
 - **Landfill & Ash-Pond Dumping:** Millions of tons of recyclable byproducts are dumped into landfills, ash ponds, and open fields, causing severe soil/water contamination and heavy pollution control board (PCB) penalties.
-- **Missing Chain of Custody:** Lack of verified test lab reports, GST verification, and digital transit manifests leads to hazardous material mishandling and fraud.
+- **Missing Chain of Custody:** Lack of verified test lab reports, GST verification, and digital transit manifests leads to hazardous material mishandling and regulatory fraud.
+
+---
+
+## ⚖️ Market Comparison: Traditional Middlemen vs. Waste Exchange
+
+| Dimension | Traditional Middleman Brokerage | 🌿 Waste Exchange Platform |
+|---|---|---|
+| **Broker Fee / Spread** | 40% – 60% margin loss to industry | **2% – 4% transparent platform fee** |
+| **Material Traceability** | 0% (Untraceable cash transactions) | **100% Cryptographic SHA-256 digital trail** |
+| **Compliance & Permits** | Unregulated, frequent illegal fly-tipping | **Accredited PCB authorization checks** |
+| **Lab Quality & Grade** | Anecdotal / visual estimation | **Verified lab test reports on AWS S3** |
+| **Speed to Match** | 2 to 4 weeks of phone negotiations | **Instant AI synergy & GIS proximity match** |
+| **Contract Security** | Informal, rampant default risks | **Automated contact-masked negotiations** |
+| **Environmental Impact** | Zero tracking or ESG recognition | **Real-time CO2 offset & landfill diversion metrics** |
 
 ---
 
@@ -138,7 +162,47 @@ To demonstrate exactly how the platform works in real time, here are two real-wo
 
 ---
 
-## 🚀 Platform Core Features
+## 🔄 End-to-End Workflow & Lifecycle
+
+The following sequence details how a byproduct lifecycle moves from factory floor listing to carbon settlement:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Seller as Seller (Tharsan / Shaurgesh)
+    participant API as FastAPI Backend
+    participant S3 as AWS S3 Private Vault
+    participant DB as Supabase PostgreSQL
+    actor Admin as Admin Team
+    actor Buyer as Buyer (Surendar / Ananthi)
+
+    Seller->>API: 1. Register & Upload GST / PCB Licences
+    API->>S3: Validate SHA-256 & Store Encrypted (AES-256)
+    API->>DB: Record Document Metadata (Status: Pending)
+    Admin->>API: 2. Review Verification Queue via 5-min Presigned URL
+    Admin->>DB: Approve Industry (Status: Approved)
+    
+    Seller->>API: 3. Post Byproduct Listing + Lab Report
+    API->>DB: Save Listing & Generate Unique Batch QR Code
+    
+    Buyer->>API: 4. Search Proximity Radius & Trigger AI Matcher
+    API-->>Buyer: Return Matches (Distance + Chemical Synergy %)
+    
+    Buyer->>API: 5. Initiate RFQ / Counter-Offer
+    Seller->>Buyer: Chat Negotiation (Phone & Email Masked)
+    
+    Buyer->>API: 6. Finalize Contract & Confirm Payment Stage
+    API->>API: Generate PDF Manifest (ReportLab) + SHA-256 Hash
+    API->>S3: Store Manifest in Private S3 Bucket
+    
+    Buyer->>API: 7. Scan QR Code on Delivery Confirmation
+    API->>DB: Mark Deal Delivered & Compute CO2 / Landfill Savings
+    API-->>Seller: Issue Green Passport & ESG Credits
+```
+
+---
+
+## 🚀 Platform Core Features & Innovations
 
 | Feature | Description | Technical Implementation |
 |---|---|---|
@@ -153,7 +217,7 @@ To demonstrate exactly how the platform works in real time, here are two real-wo
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ System Architecture & AWS S3 Vault
 
 ```
 [ Client Layer ]
@@ -173,12 +237,41 @@ To demonstrate exactly how the platform works in real time, here are two real-wo
         │     • Row Level Security (RLS) Policies
         │     • Spatial Lat/Lng Coordinates
         │
-        └─── AWS S3 Cloud Storage
+        └─── AWS S3 Private Storage
               • Private Bucket (`waste-exchange-private-storage`)
               • Server-Side Encryption (AES256)
               • SHA-256 Hash Integrity Verification
               • Time-limited (5-min) Presigned Download URLs
 ```
+
+### AWS S3 Storage Architecture (Replacing Default Storage)
+To satisfy rigorous industrial data privacy and hackathon criteria:
+1. **Private by Default:** Bucket public access is 100% blocked via AWS IAM bucket policy.
+2. **Server-Side Encryption:** All uploads enforce `ServerSideEncryption='AES256'` at rest.
+3. **MIME & Size Enforcement:** Strict 10MB file limit with magic byte MIME inspection (`application/pdf`, `image/png`, `image/jpeg`).
+4. **Pre-signed Access Windows:** Direct S3 links expire after **300 seconds (5 minutes)** and are granted strictly to verified owners and admins.
+5. **Cross-Tenant Isolation:** Automated test proves Industry B cannot read Industry A's private documents.
+
+---
+
+## 📊 Carbon Accounting & ESG Mathematical Model
+
+The platform's environmental calculation engine (`apps/api/app/services/carbon.py`) quantifies real-time ESG metrics:
+
+### 1. Net CO2 Offset Calculation
+$$\text{CO}_2\text{ Saved (kg)} = \Big( Q \times \text{EF}_{\text{virgin}} \times (1 - \lambda) \Big) - \Big( Q \times D \times \text{EF}_{\text{freight}} \Big)$$
+
+Where:
+- $Q$ = Total quantity of byproduct exchanged (in kg).
+- $\text{EF}_{\text{virgin}}$ = Emission factor of virgin material being displaced (e.g., $0.80\text{ kg CO}_2/\text{kg}$ for clinker; $1.50\text{ kg CO}_2/\text{kg}$ for coal).
+- $\lambda$ = Processing efficiency loss factor (typically $0.05$ to $0.10$).
+- $D$ = Haversine transit distance between seller and buyer (km).
+- $\text{EF}_{\text{freight}}$ = Heavy freight transport emission factor ($0.000105\text{ kg CO}_2/\text{kg}\cdot\text{km}$).
+
+### 2. Landfill Diversion (kg)
+$$\text{Landfill Diverted} = Q \times \delta_{\text{divert}}$$
+
+Where $\delta_{\text{divert}}$ is the diversion coefficient ($0.95$ for slag/fly ash, $0.90$ for biomass).
 
 ---
 
@@ -192,11 +285,31 @@ To demonstrate exactly how the platform works in real time, here are two real-wo
 
 ---
 
+## 🔌 REST API Quick Reference
+
+| Endpoint | Method | Access / RBAC | Description |
+|---|---|---|---|
+| `/api/v1/auth/register` | `POST` | Public | Register new user with bcrypt hash & JWT issuance |
+| `/api/v1/auth/login` | `POST` | Public | Authenticate user credentials & issue bearer token |
+| `/api/v1/auth/me` | `GET` | Authenticated | Retrieve authenticated profile & linked industry data |
+| `/api/v1/industries` | `POST` | Authenticated | Create industry onboarding profile (GST, GPS, contact) |
+| `/api/v1/industries/{id}/documents` | `POST` | Owner / Admin | Upload KYC/PCB document to private AWS S3 bucket |
+| `/api/v1/industries/verification-queue` | `GET` | `admin` only | Fetch pending industries with 5-min presigned URLs |
+| `/api/v1/industries/{id}/verification` | `PATCH` | `admin` only | Approve, reject, or suspend industry verification |
+| `/api/v1/listings` | `GET` | Public / Filtered | Browse active byproduct listings with radius filter |
+| `/api/v1/listings` | `POST` | `approved` Seller | Create waste listing with batch code & QR generation |
+| `/api/v1/matching/recommendations/{id}` | `GET` | Authenticated | Run AI synergy match for a given listing or need |
+| `/api/v1/pricing/suggestions` | `GET` | Authenticated | Get dynamic pricing recommendations for a material |
+| `/api/v1/deals/{id}/manifest` | `POST` | Deal Participants | Generate legal PDF transit manifest with SHA-256 hash |
+| `/api/v1/dashboard/admin` | `GET` | `admin` only | Platform metrics, ESG carbon tally, and fraud alerts |
+
+---
+
 ## 🗄️ Database Schema & Security Policies
 
 The database is built on Supabase PostgreSQL with 25 normalized tables and granular RLS:
 
-- `profiles` — User identity, role (`admin`, `industry_admin`, `industry_staff`), contact info.
+- `profiles` — User identity, role (`admin`, `seller`, `buyer`), contact info.
 - `industries` — KYC data, GSTIN, PCB consent numbers, GPS coordinates, verification status (`pending`, `approved`, `rejected`, `suspended`).
 - `industry_documents` — AWS S3 storage keys, SHA-256 hashes, document types (`gst`, `license`, `pcb_auth`).
 - `waste_categories` & `waste_types` — Hierarchical classification of industrial streams.
@@ -358,6 +471,17 @@ tests/test_security.py::test_contact_info_masking PASSED                 [100%]
 
 ======================= 19 passed, 4 warnings in 13.69s =======================
 ```
+
+---
+
+## 🔮 Future Roadmap & Horizons
+
+- **Phase 3: IoT Smart Weighbridge Integration**
+  - Edge sensors at industrial gates capturing gross tare weight, feeding live batch confirmation into digital manifests.
+- **Phase 4: On-Chain ESG Carbon Credits**
+  - Tokenizing verified $CO_2$ offsets onto public ledgers for audited corporate Scope 3 emission reporting.
+- **Phase 5: Autonomous Multi-Stop Circular Logistics**
+  - AI route optimization consolidating byproduct collection runs across industrial corridors to minimize empty return mileage.
 
 ---
 
