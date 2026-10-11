@@ -27,13 +27,34 @@ class LoginSchema(BaseModel):
 @router.post("/register", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 async def register_user(payload: RegisterSchema, db: Session = Depends(get_db)):
     """Registers a new user account with bcrypt password hashing and RBAC role."""
-    # Check if user exists
+    # Map role to database ENUM ('admin', 'industry_admin', 'industry_staff')
+    db_role = "admin" if payload.role == "admin" else "industry_admin"
     user_id = uuid.uuid4()
+
+    # Try creating user in Supabase Auth if available
+    try:
+        supabase = get_supabase_client()
+        auth_res = supabase.auth.sign_up({
+            "email": payload.email,
+            "password": payload.password,
+            "options": {
+                "data": {
+                    "full_name": payload.full_name,
+                    "role": payload.role
+                }
+            }
+        })
+        if auth_res.user and auth_res.user.id:
+            user_id = uuid.UUID(auth_res.user.id)
+    except Exception as e:
+        print(f"Supabase auth sign_up notice: {e}")
+
+    # Save to public.profiles table
     new_user = User(
         id=user_id,
         full_name=payload.full_name,
         phone=payload.phone,
-        role=payload.role,
+        role=db_role,
         preferred_language="en"
     )
     db.add(new_user)
@@ -42,8 +63,7 @@ async def register_user(payload: RegisterSchema, db: Session = Depends(get_db)):
         db.refresh(new_user)
     except Exception as e:
         db.rollback()
-        # In case profiles table requires auth.users, return clean payload
-        pass
+        print(f"Profiles insert notice: {e}")
 
     # Issue access token
     token = create_access_token({
